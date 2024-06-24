@@ -19,7 +19,9 @@ function ctrl_c(){
 trap ctrl_c INT
 
 function helpPanel(){
-  echo -e "\n[+] Usage:"
+  echo -e "\n${yellowColour}[+]${endColour}${grayColour} Usage:${endColour}" 
+  echo -e "\t${purpleColour}m) ${endColour}${grayColour}Find by a machine's name${endColour}"
+  echo -e "\t${purpleColour}h) ${endColour}${grayColour}Show help${endColour}\n"
 }
 
 function searchMachine (){
@@ -32,7 +34,7 @@ declare -i parameter_counter=0
 while getopts "m:h" arg; do 
   case $arg in 
     m) machineName=$OPTARG; let parameter_counter+=1;;
-    h) helpPanel;;
+    h) ;;
   esac
 done
 
@@ -41,11 +43,5 @@ if [ $parameter_counter -eq 1 ]; then
 else
   helpPanel
 fi
-
-
-
-
-
-
 
 
