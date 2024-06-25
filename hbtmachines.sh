@@ -26,6 +26,7 @@ function helpPanel(){
   echo -e "\t${purpleColour}u) ${endColour}${grayColour}Update files${endColour}"
   echo -e "\t${purpleColour}m) ${endColour}${grayColour}Find by a machine's name${endColour}"
   echo -e "\t${purpleColour}i) ${endColour}${grayColour}Find by a machine's IP${endColour}"
+  echo -e "\t${purpleColour}y) ${endColour}${grayColour}Get YT's solution${endColour}"
   echo -e "\t${purpleColour}h) ${endColour}${grayColour}Show help${endColour}\n"
 }
 
@@ -72,14 +73,21 @@ function searchIP(){
   echo -e "\n${yellowColour}[+]${endColour} ${grayColour}The machine owner of the address${endColour} ${blueColour}$ipAddr${endColour} ${grayColour}is:${endColour}${purpleColour} $machineName ${endColour}\n"
 }
 
+function getYTLink(){
+  machineName="$1"
+  ytLink="$(cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//' | grep youtube | awk 'NF{print $NF}')" 
+  echo -e "YT link $ytLink"
+}
+
 # Indicators
 declare -i parameter_counter=0
 
-while getopts "m:ui:h" arg; do 
+while getopts "m:ui:y:h" arg; do 
   case $arg in 
-    m) machineName=$OPTARG; let parameter_counter+=1;;
+    m) machineName="$OPTARG"; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
-    i) ipAddress=$OPTARG; let parameter_counter+=3;;
+    i) ipAddress="$OPTARG"; let parameter_counter+=3;;
+    y) machineName="$OPTARG"; let parameter_counter+=4;;
     h) ;;
   esac
 done
@@ -90,6 +98,8 @@ elif [ $parameter_counter -eq 2 ]; then
   updateFiles
 elif [ $parameter_counter -eq 3 ]; then
   searchIP $ipAddress
+elif [ $parameter_counter -eq 4 ]; then
+  getYTLink $machineName
 else
   helpPanel
 fi
