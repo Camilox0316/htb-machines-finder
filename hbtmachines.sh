@@ -23,14 +23,16 @@ main_url="https://htbmachines.github.io/bundle.js"
 
 function helpPanel(){
   echo -e "\n${yellowColour}[+]${endColour}${grayColour} Usage:${endColour}" 
-  echo -e "\t${purpleColour}u) ${endColour}${grayColour}Find by a machine's name${endColour}"
+  echo -e "\t${purpleColour}u) ${endColour}${grayColour}Update files${endColour}"
   echo -e "\t${purpleColour}m) ${endColour}${grayColour}Find by a machine's name${endColour}"
+  echo -e "\t${purpleColour}i) ${endColour}${grayColour}Find by a machine's IP${endColour}"
   echo -e "\t${purpleColour}h) ${endColour}${grayColour}Show help${endColour}\n"
 }
 
 function searchMachine (){
   machineName="$1"
-  echo "$machineName"
+  echo -e "\n${yellowColour}[+]${endColour} ${grayColour} Showing${endColour} ${blueColour}$machineName ${endColour} ${grayColour}properties:${endColour}\n"
+  cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//'
 }
 
 function updateFiles(){
@@ -63,13 +65,21 @@ function updateFiles(){
   fi
   tput cnorm
 }
+
+function searchIP(){
+  ipAddr="$1"
+  machineName="$(cat bundle.js | grep "ip: \"$ipAddr\"" -B 3 | grep "name: " | awk 'NF {print $NF}' | tr -d '"' | tr -d ",")"
+  echo -e "\n${yellowColour}[+]${endColour} ${grayColour}The machine owner of the address${endColour} ${blueColour}$ipAddr${endColour} ${grayColour}is:${endColour}${purpleColour} $machineName ${endColour}\n"
+}
+
 # Indicators
 declare -i parameter_counter=0
 
-while getopts "m:uh" arg; do 
+while getopts "m:ui:h" arg; do 
   case $arg in 
     m) machineName=$OPTARG; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
+    i) ipAddress=$OPTARG; let parameter_counter+=3;;
     h) ;;
   esac
 done
@@ -78,6 +88,8 @@ if [ $parameter_counter -eq 1 ]; then
   searchMachine $machineName 
 elif [ $parameter_counter -eq 2 ]; then
   updateFiles
+elif [ $parameter_counter -eq 3 ]; then
+  searchIP $ipAddress
 else
   helpPanel
 fi
