@@ -34,9 +34,14 @@ function searchMachine (){
 }
 
 function updateFiles(){
-  curl -s -X GET $main_url > bundle.js
-  js-beautify bundle.js | sponge bundle.js
-  echo -e "\n[+] Starting updates\n"
+  if [ ! -f bundle.js ]; then
+    echo -e "\n${yellowColour}[+]${endColour}${grayColour} Downloading necessary filese... ${endColour}"
+    curl -s -X GET $main_url > bundle.js
+    js-beautify bundle.js | sponge bundle.js
+    echo -e "\n${yellowColour}[+]${endColour}${grayColour}All up to date${endColour}"
+  else
+    echo -e "\n All good"
+  fi
 }
 # Indicators
 declare -i parameter_counter=0
