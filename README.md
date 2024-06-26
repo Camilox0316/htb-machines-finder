@@ -4,7 +4,7 @@
 
 ### Introduction
 
-Welcome to our first Bash project! In this project, we will dive into the world of Bash command language by creating a useful search tool.
+Welcome to this project where I am learning Bash scriptin
 
 ### Project Objective
 
