@@ -19,9 +19,8 @@ The goal of this project is to create a search tool that mimics the functionalit
 5. **Difficulty Level**: Filter machines by their difficulty levels.
 6. **Techniques Used**: Search for machines based on the techniques employed.
 
-### What You Will Learn
+### What I am learning creating this tool
 
-By working on this project, you will:
 - Gain a deeper understanding of Bash scripting.
 - Learn how to handle and process command-line input.
 - Develop skills to manipulate and search through data efficiently.
