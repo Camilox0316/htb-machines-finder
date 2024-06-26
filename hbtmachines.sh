@@ -27,6 +27,7 @@ function helpPanel(){
   echo -e "\t${purpleColour}m) ${endColour}${grayColour}Find by a machine's name${endColour}"
   echo -e "\t${purpleColour}i) ${endColour}${grayColour}Find by a machine's IP${endColour}"
   echo -e "\t${purpleColour}y) ${endColour}${grayColour}Get YT's solution${endColour}"
+  echo -e "\t${purpleColour}d) ${endColour}${grayColour}Get Machines by difficulty${endColour}"
   echo -e "\t${purpleColour}h) ${endColour}${grayColour}Show help${endColour}\n"
 }
 
@@ -96,16 +97,43 @@ function getYTLink(){
   fi
 }
 
+function setDifficultyColor(){
+  difficulty="$1"
+  machines="$2"
+  if [[ "$difficulty" == "Fácil" ]]; then
+    color="${greenColour}"
+  elif [ "$difficulty" == "Media" ]; then
+    color="${yellowColour}"
+  elif [ "$difficulty" == "Difícil" ]; then
+    color="${redColour}"
+  else
+    color="${purpleColour}"  
+  fi
+  echo -e "${color}$machines${endColour}"
+}
 
+function getMachinesByDifficulty(){
+  diff="$1"
+  machines="$(cat bundle.js | grep "dificultad: \"$diff\"" -B 5 | grep name | awk 'NF {print $NF}' | tr -d '"' | tr -d ',' | column)"
+  if [[ "$machines" ]]; then
+    echo -e "\n${yellowColour}[+]${endColour} ${grayColour}Showing machines with ${endColour}${blueColour}$diff${endColour} ${grayColour}difficulty:${endColour} \n" 
+    setDifficultyColorOutput=$(setDifficultyColor "$diff" "$machines")
+    echo -e "$setDifficultyColorOutput"
+  else
+    echo -e "${redColour}[!] Wrong difficulty ${endColour}"
+  fi
+
+}
 # Indicators
 declare -i parameter_counter=0
 
-while getopts "m:ui:y:h" arg; do 
+while getopts "m:ui:y:d:h" arg; do 
   case $arg in 
     m) machineName="$OPTARG"; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
     i) ipAddress="$OPTARG"; let parameter_counter+=3;;
     y) machineName="$OPTARG"; let parameter_counter+=4;;
+    d) difficulty="$OPTARG"; let parameter_counter+=5;;
     h) ;;
   esac
 done
@@ -118,6 +146,8 @@ elif [ $parameter_counter -eq 3 ]; then
   searchIP $ipAddress
 elif [ $parameter_counter -eq 4 ]; then
   getYTLink $machineName
+elif [ $parameter_counter -eq 5 ]; then
+  getMachinesByDifficulty $difficulty
 else
   helpPanel
 fi
