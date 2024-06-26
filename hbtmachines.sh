@@ -32,8 +32,13 @@ function helpPanel(){
 
 function searchMachine (){
   machineName="$1"
-  echo -e "\n${yellowColour}[+]${endColour} ${grayColour} Showing${endColour} ${blueColour}$machineName ${endColour} ${grayColour}properties:${endColour}\n"
-  cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//'
+  machineName_Checker="$(cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//')"
+  if [ "$machineName_Checker" ]; then
+    echo -e "\n${yellowColour}[+]${endColour} ${grayColour} Showing${endColour} ${blueColour}$machineName ${endColour} ${grayColour}properties:${endColour}\n"
+    cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//'
+  else
+    echo -e "\n${redColour}[!] Machine not found${endColour}\n"
+  fi 
 }
 
 function updateFiles(){
@@ -69,15 +74,28 @@ function updateFiles(){
 
 function searchIP(){
   ipAddr="$1"
-  machineName="$(cat bundle.js | grep "ip: \"$ipAddr\"" -B 3 | grep "name: " | awk 'NF {print $NF}' | tr -d '"' | tr -d ",")"
-  echo -e "\n${yellowColour}[+]${endColour} ${grayColour}The machine owner of the address${endColour} ${blueColour}$ipAddr${endColour} ${grayColour}is:${endColour}${purpleColour} $machineName ${endColour}\n"
+  ip_checker="$(cat bundle.js | grep "ip: \"$ipAddr\"" -B 3 | grep "name: " | awk 'NF {print $NF}' | tr -d '"' | tr -d ",")"
+
+  if [ "$ip_checker" ]; then
+    machineName="$(cat bundle.js | grep "ip: \"$ipAddr\"" -B 3 | grep "name: " | awk 'NF {print $NF}' | tr -d '"' | tr -d ",")"
+    echo -e "\n${yellowColour}[+]${endColour} ${grayColour}The machine owner of the address${endColour} ${blueColour}$ipAddr${endColour} ${grayColour}is:${endColour}${purpleColour} $machineName ${endColour}\n"
+
+  else
+    echo -e "\n${redColour}[!] IP not found${endColour}\n"
+  fi
 }
 
 function getYTLink(){
   machineName="$1"
   ytLink="$(cat bundle.js | awk "/name: \"$machineName\"/,/resuelta:/" | grep -vE "id:|sku:|resuelta" | tr -d '"' | tr -d ',' | sed 's/^ *//' | grep youtube | awk 'NF{print $NF}')" 
-  echo -e "YT link $ytLink"
+  if [[ "$ytLink" ]]; then
+    echo -e "${yellowColour}[!]${endColour} ${grayColour} The tutorial to solve this machine is here: ${endColour} ${blueColour}$ytLink${endColour}"
+  else
+    echo -e "\n${redColour}[!] Machine not found${endColour}\n"
+    
+  fi
 }
+
 
 # Indicators
 declare -i parameter_counter=0
