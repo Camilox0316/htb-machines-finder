@@ -28,6 +28,7 @@ function helpPanel(){
   echo -e "\t${purpleColour}i) ${endColour}${grayColour}Find by a machine's IP${endColour}"
   echo -e "\t${purpleColour}y) ${endColour}${grayColour}Get YT's solution${endColour}"
   echo -e "\t${purpleColour}d) ${endColour}${grayColour}Get Machines by difficulty${endColour}"
+  echo -e "\t${purpleColour}o) ${endColour}${grayColour}Get Machines by Operating system${endColour}"
   echo -e "\t${purpleColour}h) ${endColour}${grayColour}Show help${endColour}\n"
 }
 
@@ -124,16 +125,30 @@ function getMachinesByDifficulty(){
   fi
 
 }
+
+function getMachinesByOS(){
+  OS="$1"
+  os_checker="$(cat bundle.js | grep "so: \"$OS\"" -B 5  | grep name | awk 'NF{print $NF}' | tr -d '"' | tr -d ',' | column)"
+  if [[ "$os_checker" ]]; then
+    echo -e "\n${yellowColour}[+]${endColour} ${grayColour}Showing${endColour} ${blueColour}$OS${endColour} ${grayColour}machines${endColour}\n\n$os_checker\n"
+    
+  else
+    echo -e "\n${redColour}[!]OS not found${endColour}\n"
+    
+  fi
+}
+
 # Indicators
 declare -i parameter_counter=0
 
-while getopts "m:ui:y:d:h" arg; do 
+while getopts "m:ui:y:d:o:h" arg; do 
   case $arg in 
     m) machineName="$OPTARG"; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
     i) ipAddress="$OPTARG"; let parameter_counter+=3;;
     y) machineName="$OPTARG"; let parameter_counter+=4;;
     d) difficulty="$OPTARG"; let parameter_counter+=5;;
+    o) OS="$OPTARG"; let parameter_counter+=6;;
     h) ;;
   esac
 done
@@ -148,6 +163,8 @@ elif [ $parameter_counter -eq 4 ]; then
   getYTLink $machineName
 elif [ $parameter_counter -eq 5 ]; then
   getMachinesByDifficulty $difficulty
+elif [ $parameter_counter -eq 6 ]; then
+  getMachinesByOS $OS
 else
   helpPanel
 fi
