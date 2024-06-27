@@ -28,7 +28,8 @@ function helpPanel(){
   echo -e "\t${purpleColour}i) ${endColour}${grayColour}Find by a machine's IP${endColour}"
   echo -e "\t${purpleColour}y) ${endColour}${grayColour}Get YT's solution${endColour}"
   echo -e "\t${purpleColour}d) ${endColour}${grayColour}Get Machines by difficulty${endColour}"
-  echo -e "\t${purpleColour}o) ${endColour}${grayColour}Get Machines by Operating system${endColour}"
+  echo -e "\t${purpleColour}o) ${endColour}${grayColour}Get Machines by Operating system${endColour}" 
+  echo -e "\t${purpleColour}s) ${endColour}${grayColour}Get Machines by Skills${endColour}"
   echo -e "\t${purpleColour}h) ${endColour}${grayColour}Show help${endColour}\n"
 }
 
@@ -151,13 +152,25 @@ function getOSDifficultyMachines(){
     echo -e "\n${redColour}[!] Wrong difficulty or OS${endColour}\n"
   fi
 }
+
+function getSkill(){
+  skills="$1"
+  checkResult="$(cat bundle.js | grep "skills: " -B 6 | grep "$skills" -i -B 6 | grep "name: " | awk 'NF{print $NF}' | tr -d '"' | tr -d ',' | column)"
+  if [[ "$checkResult" ]]; then
+    echo -e "\n${yellowColour}[+]${endColour} ${grayColour}Showing machines with the skill:${endColour} ${blueColour}$skills${endColour}\n\n$checkResult\n"
+  else
+    echo -e "\n${redColour}[!] Wrong skill${endColour}\n"
+    
+  fi
+}
+
 # Indicators
 declare -i parameter_counter=0
 
 # Sneak
 declare -i sneak_difficulty=0
 declare -i sneak_OS=0
-while getopts "m:ui:y:d:o:h" arg; do 
+while getopts "m:ui:y:d:o:s:h" arg; do 
   case $arg in 
     m) machineName="$OPTARG"; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
@@ -165,6 +178,7 @@ while getopts "m:ui:y:d:o:h" arg; do
     y) machineName="$OPTARG"; let parameter_counter+=4;;
     d) difficulty="$OPTARG"; sneak_difficulty=1; let parameter_counter+=5;;
     o) OS="$OPTARG"; sneak_OS=1; let parameter_counter+=6;;
+    s) skills="$OPTARG"; let parameter_counter+=7;;
     h) ;;
   esac
 done
@@ -183,6 +197,8 @@ elif [ $parameter_counter -eq 6 ]; then
   getMachinesByOS $OS
 elif [ $sneak_difficulty -eq 1 ] && [ $sneak_OS -eq 1 ]; then
   getOSDifficultyMachines $difficulty $OS
+elif [ $parameter_counter -eq 7 ]; then
+  getSkill "$skills"
 else
   helpPanel
 fi
