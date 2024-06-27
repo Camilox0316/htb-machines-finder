@@ -138,17 +138,33 @@ function getMachinesByOS(){
   fi
 }
 
+function getOSDifficultyMachines(){
+  difficulty="$1"
+  OS="$2"
+  check="$(cat bundle.js | grep "so: \"$OS\"" -C 4 | grep "dificultad: \"$difficulty\"" -B 5 | grep "name: "| awk 'NF {print $NF}' | tr -d ',' | tr -d '"' | column)"
+  if [ "$check" ]; then
+    echo -e "\n${yellowColour}[+]${endColour} ${grayColour}Showing${endColour}${blueColour} $difficulty${endColour}${grayColour} machines in${endColour}${purpleColour} $OS${endColour}${grayColour} systems${endColour}\n"
+    setDifficultyColorOutput=$(setDifficultyColor "$difficulty" "$check")
+    echo -e "$setDifficultyColorOutput"
+    #cat bundle.js | grep "so: \"$OS\"" -C 4 | grep "dificultad: \"$difficulty\"" -B 5 | grep "name: "| awk 'NF {print $NF}' | tr -d ',' | tr -d '"' | column
+  else
+    echo -e "\n${redColour}[!] Wrong difficulty or OS${endColour}\n"
+  fi
+}
 # Indicators
 declare -i parameter_counter=0
 
+# Sneak
+declare -i sneak_difficulty=0
+declare -i sneak_OS=0
 while getopts "m:ui:y:d:o:h" arg; do 
   case $arg in 
     m) machineName="$OPTARG"; let parameter_counter+=1;;
     u) let parameter_counter+=2;;
     i) ipAddress="$OPTARG"; let parameter_counter+=3;;
     y) machineName="$OPTARG"; let parameter_counter+=4;;
-    d) difficulty="$OPTARG"; let parameter_counter+=5;;
-    o) OS="$OPTARG"; let parameter_counter+=6;;
+    d) difficulty="$OPTARG"; sneak_difficulty=1; let parameter_counter+=5;;
+    o) OS="$OPTARG"; sneak_OS=1; let parameter_counter+=6;;
     h) ;;
   esac
 done
@@ -165,6 +181,8 @@ elif [ $parameter_counter -eq 5 ]; then
   getMachinesByDifficulty $difficulty
 elif [ $parameter_counter -eq 6 ]; then
   getMachinesByOS $OS
+elif [ $sneak_difficulty -eq 1 ] && [ $sneak_OS -eq 1 ]; then
+  getOSDifficultyMachines $difficulty $OS
 else
   helpPanel
 fi
